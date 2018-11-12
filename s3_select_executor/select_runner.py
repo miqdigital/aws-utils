@@ -39,7 +39,7 @@ def write_to_console(r):
     for event in r['Payload']:
         if 'Records' in event:
             records = event['Records']['Payload'].decode('utf-8')
-            print records
+            print records.encode('utf-8')
 
 
 def perform(bucket, prefix, expression, compression, content_type, content_options, output_file):
@@ -74,7 +74,7 @@ def perform(bucket, prefix, expression, compression, content_type, content_optio
             Key=prefix,
             ExpressionType='SQL',
             Expression=expression,
-            InputSerialization={'CompressionType': compression, 'CSV': content_options},
+            InputSerialization={'CompressionType': compression, content_type: content_options},
             OutputSerialization={'CSV': {}},
     )
 
