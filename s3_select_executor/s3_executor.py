@@ -74,51 +74,89 @@ def fetch_args():
                         help='''Provide the bucket name, for example:  bucket-name ''')
     parser.add_argument('-p', metavar='--prefix',
                         help='''Provide the prefix - till the folder, for example: path/to/file/mysample-file.tsv.gz''')
-    parser.add_argument('-comp', metavar='--compression',
-                        help='''Is the compression available-true/false ''', default=True)
-    parser.add_argument('-c', metavar='--ctype',
-                        help='Content Type of the file - CSV/JSON',
-                        default='CSV')
-    parser.add_argument('-d', metavar='--delimiter',
-                        help='Provide the Delimiter - COMMA/TAB',
-                        default='COMMA')
-    parser.add_argument('-s', metavar='--sql',
-                        help='''Provide the SQL to be executed, for example:
-                              select _1, _2, _20 from s3object s where _88 != 'VIEW_DETECTED' limit 10''', default='')
-    parser.add_argument('-o', metavar='--outputfile',
-                        help='Provide the filename to dump the records fetched', default='')
-    parser.add_argument('-e', metavar='--throwerror',
-                        help='Boolean value true/false - which determines whether to throw error while processing', default='false')
+    parser.add_argument('-comp', metavar='--compression', help='''Is the compression
+            available - GZIP/None/BZIP2''', default="GZIP")
+    parser.add_argument('-c', metavar='--ctype', help='Content Type of the file - CSV/JSON/Parquet',
+            default='CSV')
+    parser.add_argument('-d', metavar='--delimiter', help='Provide the Delimiter - COMMA/TAB', default='COMMA')
+    parser.add_argument('-s', metavar='--sql', help='''Provide the SQL to be executed, for example:
+            select _1, _2, _20 from s3object s where _88 != 'VIEW_DETECTED' limit 10''', default='')
+    parser.add_argument('-o', metavar='--outputfile', help='Provide the filename to dump the records fetched', default='')
+    parser.add_argument('-e', metavar='--throwerror', help='Boolean value true/false - which determines whether to throw error while processing', default='false')
 
     return parser
 
 
+def get_compression(comp):
+    """
+    Get's the value the compression, in case there is no compression provided then it would be empty string.
+    """
+    value = ""
+    if comp:
+        value = comp
+
+    return value
+
+def get_content_type(content_type):
+    """
+    Get's the content_type for respective option.
+    In case it's a TSV or CSV the return value is always csv
+    """
+    value = "CSV"
+    if content_type == "Parquet":
+        value = content_type
+
+    return value
+
+def get_delimiter(delimiter):
+    """
+    Get's the delimiter, in case nothing is given, then it would None
+    """
+    value = None
+    if delimiter == "COMMA":
+        value = ","
+    elif delimiter == "TAB":
+        value = "\t"
+
+    return value
+
+def get_content_options(kwargs):
+    """
+    Get's the content options for given data.
+    For Parquet this is not needed.
+    """
+    content_options = {}
+
+    if kwargs['content_type'] != 'Parquet':
+        content_options = {'AllowQuotedRecordDelimiter': True, 'QuoteCharacter' : ""}
+        if delimiter:
+            content_options['FieldDelimiter'] = kwargs['delimiter']
+
+    return content_options
+
+
 if __name__ == '__main__':
     parser = fetch_args()
-
     args = parser.parse_args()
+
     sql = args.s
     bucket = args.b
-    comp = ('GZIP' if args.comp else '')
-    content_type = args.c
-    delimiter = args.d
-    output_file = args.o
     prefix = args.p
-    delimiter_req = (',' if delimiter == 'COMMA' else '\t')
     throwerror = args.e
 
     if bucket is None or prefix is None or sql is None:
-        print 'Please use: python data_validator.py --help and pass valid arguments'
+        print "Please use: python data_validator.py --help and pass valid arguments"
         exit(1)
 
     object_items = fetch_objects(bucket, prefix, throwerror)
+
+    comp = get_compression(args.comp)
+    content_type = get_content_type(args.c)
+    delimiter = get_delimiter(args.d)
+    output_file = args.o
+    content_options = get_content_options({ 'content_type': content_type, 'delimiter': delimiter })
+
     for item in object_items:
-        perform(
-                bucket,
-                item,
-                sql,
-                comp,
-                content_type,
-                {'FieldDelimiter': delimiter_req, 'AllowQuotedRecordDelimiter': True, 'QuoteCharacter': ''},
-                output_file)
+        perform(bucket, item, sql, comp, content_type, content_options, output_file)
+
 
