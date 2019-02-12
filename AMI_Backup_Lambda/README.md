@@ -7,7 +7,7 @@
 * Python library Pytz
 * Python library Requests
 * Lambda Role which you use requires EC2-Read access, AMI Full access and Resource Tagging access
-* All the instances which needs AMI to be created has to be tagged and that tag will be used by Lambda function to identify the instances(We are using tag Key:AMIBACKUPON, Value:yes) 
+* All the instances which needs AMI to be created has to be tagged and that tag will be used by Lambda function to identify the instances(We are using tag Key:# AMIBACKUPON, Value:# yes) 
 
 Function uses two libraries other than AWS SDK provided(Pytz, Requests), so we need to create deployment package along with the code and upload it to Lambda function. Please go through the official AWS [Documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html) to know more about how to create deployment package.
 
