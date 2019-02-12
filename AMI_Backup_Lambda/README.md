@@ -1,6 +1,6 @@
 # Introduction
 
-Lambda function is for creating AMI as a backup for all required instances based on the tags and delete older AMI's. We are using two functions which runs everyday once as per the schedule
+This Lambda function is for creating AMI as a backup for all required instances based on the tags and delete older AMI's. We are using two functions which runs everyday once as per the schedule
 
 ## Prerequisites
 
