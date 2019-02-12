@@ -11,4 +11,4 @@ Used for validation and ad hoc filtering. [Documentation](s3_select_executor/REA
 
 ## Lambda Function for AMI Backup with Retention Period
 
-This function is for creating AMI as a backup for all required instances along with the tags and delete older AMI's based on the retention period we provide.
+This function is for creating AMI as a backup for required instance and delete older AMI's based on the retention period we provide. Every AMI created will inherit tags from instance.
