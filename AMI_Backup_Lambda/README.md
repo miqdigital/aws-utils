@@ -30,6 +30,6 @@ Snapshot-tag.py tags the Snapshots of AMI which was created by AMI-Backup.py fun
 As I mentioned above you can replace/add the "Key" items in script block from line 51 to 56 and replace/add same set of tags/variables from line 69 to 87, once the snapshots are tagged the tag Snapshottag=yes will be deleted from AMI.
 
 ## NOTE
-* We are using CloudWatch Event Rules to schedule the run of Lambda Function, Snapshot-tag.py is scheduled to run after AMI-Backup.py function completion, we are using two functions as most of the times we ran into exception "errorType": "UnboundLocalError","errorMessage": "local variable 'snapshotid' referenced before assignment" as assignment of Snapshot ID took some time for some of the AMI's.
+* We are using CloudWatch Event Rules to schedule the run of Lambda Function, Snapshot-tag.py is scheduled to run after AMI-Backup.py function completion, two functions are used as most of the times we ran into exception "errorType": "UnboundLocalError","errorMessage": "local variable 'snapshotid' referenced before assignment" as assignment of Snapshot ID took some time for some of the AMI's.
 
 * Both the function uses slack notification as exception handler which can also be replaced by SNS topic or email notification as per convenience.
