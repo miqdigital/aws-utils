@@ -1,6 +1,6 @@
 # Introduction
   
- This Lambda function is for creating AMI as a backup for all required instances based on the tags. We are using two functions which runs everyday once as per the schedule
+ This Lambda function is for creating AMI as a backup for all required instances based on the tags and delete older AMI's. We are using two functions which runs everyday once as per the schedule
 
 ## Prerequisites
 
@@ -14,7 +14,8 @@ Function uses two libraries(Pytz, Requests) other than AWS SDK provided, so we n
 
 ## How it Works?
 
-* AMI-Backup.py gets all the instance ID's which has tag AMIBACKUPON=yes and creates AMI one by one in a loop and same AMI will be tagged by fetching tags from instance (which can be achieved using instance describe function), along with this it adds two new tags    
+### AMI-Backup.py 
+gets all the instance ID's which has tag AMIBACKUPON=yes and creates AMI one by one in a loop and same AMI will be tagged by fetching tags from instance (which can be achieved using instance describe function), along with this it adds two new tags    
 
 
 ## More
