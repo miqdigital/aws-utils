@@ -32,4 +32,4 @@ As I mentioned above you can replace/add the "Key" items in script block from li
 ## NOTE
 * We are using CloudWatch Event Rules to schedule the run of Lambda Function, Snapshot-tag.py is scheduled to run after AMI-Backup.py function completion, we are using two functions as most of the times we ran into exception "errorType": "UnboundLocalError","errorMessage": "local variable 'snapshotid' referenced before assignment" as assignment of Snapshot ID took some time for some of the AMI's.
 
-* Both the function uses slack notification as exception handler which can also be replace by SNS topic or email notification as per convenience.
+* Both the function uses slack notification as exception handler which can also be replaced by SNS topic or email notification as per convenience.
