@@ -6,7 +6,7 @@ import json
 import requests
 
 
-slack_webhook_url = 'https://hooks.slack.com/**************#######******************####'
+slack_webhook_url = 'https://hooks.slack.com/********###########***********######****'
 slack_channel = '#channel name'
 slack_username = 'AWS Lambda'
 
@@ -55,12 +55,13 @@ def snaptag(region):
                 if k['Key'] == 'PRODUCT':
                    Producttag = k['Value']
               
-          for j in i['BlockDeviceMappings']:    
-              
+          for j in i['BlockDeviceMappings']:  
+            if 'Ebs'in j:  
+              snapid =  j["Ebs"]["SnapshotId"]
+              print snapid
               
               try:
-                  snapid =  j["Ebs"]["SnapshotId"]
-                  print snapid
+                  
                   responsetag = client.create_tags(
                                 Resources=[
                                         snapid,
