@@ -17,11 +17,11 @@ def write_to_file(r, output_file):
           The file name to which the output can be appended.
 
     """
-    with open(output_file, 'a') as f:
+    with open(output_file, encoding='utf-8', mode='a') as f:
         for event in r['Payload']:
             if 'Records' in event:
                 records = event['Records']['Payload'].decode('utf-8')
-                if not str(records) == "":
+                if not str(records).encode('utf-8') == "":
                     f.write(records)
 
 

@@ -69,7 +69,7 @@ def fetch_args():
        Is an arguments parser which showcases all possible arguments this python function takes in.
     """
     parser = \
-        argparse.ArgumentParser(description='''Provide S3 details: example python data_validator.py -b "bucket-name" -p "path/to/file/mysample-file.tsv.gz" -d TAB -s "select * from s3object s where _88 != 'VIEW_DETECTED' limit 10" ''')
+        argparse.ArgumentParser(description='''Provide S3 details: example python s3_executor.py  -b "bucket-name" -p "path/to/file/mysample-file.tsv.gz" -d TAB -s "select * from s3object s where _88 != 'VIEW_DETECTED' limit 10" ''')
     parser.add_argument('-b', metavar='--bucket',
                         help='''Provide the bucket name, for example:  bucket-name ''')
     parser.add_argument('-p', metavar='--prefix',
@@ -145,7 +145,7 @@ if __name__ == '__main__':
     throwerror = args.e
 
     if bucket is None or prefix is None or sql is None:
-        print "Please use: python data_validator.py --help and pass valid arguments"
+        print 'Please use: python s3_executor.py --help and pass valid arguments'
         exit(1)
 
     object_items = fetch_objects(bucket, prefix, throwerror)
