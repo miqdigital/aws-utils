@@ -8,7 +8,7 @@ import requests
 
 utc=pytz.UTC
 
-slack_webhook_url = 'https://hooks.slack.com/**************#########****************#######'
+slack_webhook_url = 'https://hooks.slack.com/************#########**********####'
 slack_channel = '#channel name'
 slack_username = 'AWS Lambda'
 
@@ -51,10 +51,13 @@ def amibkp(region, days_del):
     for i in response2['Images']:
       if (i['CreationDate'] < str(old_date)):
           image_id = i['ImageId']
+          print image_id
           delimage = ec2.Image(image_id)
           snap_list = []
           for j in i['BlockDeviceMappings']:
-              snap_list.append(j['Ebs']['SnapshotId'])
+              if 'Ebs'in j:
+                 snap_list.append(j['Ebs']['SnapshotId'])
+                 
           
           try:
 
@@ -147,5 +150,3 @@ def lambda_handler(event, context):
     amibkp('eu-west-2', 10)
     amibkp('ap-southeast-1', 10)
     amibkp('eu-central-1', 10)
-
-
