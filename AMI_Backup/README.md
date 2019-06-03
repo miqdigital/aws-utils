@@ -43,8 +43,9 @@ Please the link for more information on how to generate webhook url for slack ht
  python checsyntax.py -r us-west-2 -d 5 
 ``` 
 
-### Modification for Lambda
+### Modification For Lambda
 
+* Block that needs to replaced  from line 214 to 245
 
 ```python
 def fetch_args():
@@ -79,9 +80,23 @@ if __name__ == '__main__':
         PARSER.error('If slack argument is true, it requires slack_channel and webhookurl')
 
     amibkp(ARGS.r, ARGS.d, ARGS.s, ARGS.c, ARGS.w)
- 
  ```
-
+ 
+ * Replace above lines in the script with following two lines.
+ 
+ ```python
+ 
+ # To post message to slack
+ 
+ def lambda_handler(event, context):
+    amibkp('us-east-1', 10, true, '#channel_name', 'https://hook.slack.com/********/')
+    
+ # If you don't use slack   
+ 
+ def lambda_handler(event, context):
+    amibkp('us-east-1', 10, false, 'null', 'null')
+    
+```
 
 Function uses two libraries(Pytz, Requests) other than AWS SDK provided, so for lambda we need to create deployment package along with the code and upload it to Lambda function. Please go through the official AWS [Documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html) to know more about how to create deployment package.
 
