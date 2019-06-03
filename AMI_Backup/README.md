@@ -89,7 +89,7 @@ if __name__ == '__main__':
  # To post message to slack
  
  def lambda_handler(event, context):
-    amibkp('us-east-1', 10, true, '#channel_name', 'https://hook.slack.com/********/')
+    amibkp('us-east-1', 10, true, '#channel_name', 'https://hook.slack.com/********/') # replace parameters according to your need
     
  # If you don't use slack   
  
