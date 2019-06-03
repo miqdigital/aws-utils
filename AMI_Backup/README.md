@@ -43,9 +43,9 @@ Please see the link for more information on how to generate webhook url for slac
 * Typing ```python AMI-Backup.py -h will give you the options```
 
 ### Modification For Lambda
-Code changes is required for this script to make it comaptible with Lambda.
+Code changes are required for this script to make it comaptible with Lambda.
 
-* Block that needs to be replaced,from line 214 to 245
+* Block that needs to be replaced, from line 214 to 245
 
 ```python
 def fetch_args():
