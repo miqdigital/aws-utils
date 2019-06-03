@@ -28,7 +28,7 @@ def amibkp(region, days_del, slack_req, slack_channel, slack_webhook):
     fetches all the instances which has tag Key:AMIBACKUPON, Value:yes and creates AMI in a loop,
     along with propogating all the tags from instance to AMI to EBS Snapshots.
     Also, it deletes all the AMI's which was created through this script
-    and older than number of days you provideas an argument.
+    and older than number of days you provide as an argument.
 
     Parameters
     ----------
