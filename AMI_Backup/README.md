@@ -34,10 +34,18 @@ Number of days to keep the AMI is an argument along with the region, modify thos
 
 ## Some of the examples to run the script
 
-* To create AMI's for the instances having tag Key:AMIBACKUPON Value:yes in us-east-1 region and to delete AMI's/Snapshots older than 10 days and to post exceptions to slack.
+* To create AMI's for the instances having tag Key:AMIBACKUPON Value:yes in us-east-1 region and to delete AMI's/Snapshots created through this script, also which are older than 10 days and to post exception in slack
 
 ```python
  python checsyntax.py -r us-east-1 -d 10 -s true -c "#ami_bkp_lambda" -w "https://hooks.slack.com/*********/*****"
 ``` 
+Please the link for more information on how to generate webhook url for slack https://api.slack.com/incoming-webhooks
+
+* To create AMI's for the instances having tag Key:AMIBACKUPON Value:yes in us-west-2 region and to delete AMI's/Snapshots created through this script, also which are older than 5 days and not to post slack message.
+
+```python
+ python checsyntax.py -r us-west-2 -d 5 
+``` 
+
 
 
