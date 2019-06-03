@@ -10,7 +10,7 @@ import boto3
 Utc = pytz.UTC
 
 def slack(event, channel, webhookurl):
-    #This function is used to post to the slack channel based on above details
+    #This function is used to post message to slack
     message = 'AMI_BKP_ALERT'
     payload = {'channel': channel,
                'username': "AMI_BKP_SCRIPT",
