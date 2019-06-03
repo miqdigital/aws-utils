@@ -9,8 +9,6 @@ This function is for creating AMI as a backup for all required instances based o
 * Lambda Role which you use requires EC2-Read access, AMI Full access and Resource Tagging access in case if you want to configure through Lambda
 * All the instances which needs AMI backup has to be tagged and that tag will be used by Lambda function to identify those instances(here we are using tag Key:AMIBACKUPON, Value:yes)
 
-Function uses two libraries(Pytz, Requests) other than AWS SDK provided, so for lambda we need to create deployment package along with the code and upload it to Lambda function. Please go through the official AWS [Documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html) to know more about how to create deployment package.
-
 
 ## How it Works?
 
@@ -27,10 +25,8 @@ Number of days to keep the AMI is an argument along with the region, modify thos
 
 ## Exception handler:
 
-* Both the function uses slack notification as exception handler which can also be replaced by SNS topic or email notification as per convenience and this optional parameter, if you provide -s true, this will post exception details to slack else prints the same to stdout.
+* Script uses slack notification as exception handler which can also be replaced by SNS topic or email notification as per your convenience and this is optional parameter, if you provide slack parameter as "true" will post exceptions to slack else prints the same to stdout.
 
-## NOTE 
-* We are using CloudWatch Event Rules to schedule the run of Lambda Function, two function blocks are used as most of the times we ran into exception "errorType": "UnboundLocalError","errorMessage": "local variable 'snapshotid' referenced before assignment" as assignment of Snapshot ID took some time for some of the AMI's.
 
 ## Some of the examples to run the script
 
@@ -47,5 +43,48 @@ Please the link for more information on how to generate webhook url for slack ht
  python checsyntax.py -r us-west-2 -d 5 
 ``` 
 
+### Modification for Lambda
 
+
+```python
+def fetch_args():
+    """
+       Is an arguments parser which showcases all possible arguments this python function takes in.
+    """
+    parser = \
+        argparse.ArgumentParser(description=''' Provide AWS region and number of days
+                                to keep AMI and optional slack details:example
+                                python AMI_Backup.py -r "us-east-1" -d 10 -s true -c "#AWS_BKP",
+                                -w "https://hooks.slack.com/************" ''')
+    parser.add_argument('-r', metavar='--region', required=True,
+                        help='''Provide the AWS region code, for example:  us-east-1 ''')
+    parser.add_argument('-d', metavar='--days', type=int, required=True,
+                        help='''Number of days you want to keep AMI, for example: 10 ''')
+    parser.add_argument('-s', metavar='--slack',
+                        help='''Please provide true if you want to send exception to slack ''')
+    parser.add_argument('-c', metavar='--slack_channel',
+                        help='''Slack channel, for example: "#channel_name" ''')
+    parser.add_argument('-w', metavar='--webhookurl',
+                        help='''Slack webhook URL,
+                        for example: "https://hooks.slack.com/************#########**********####",
+                        see the link for information: https://api.slack.com/incoming-webhooks ''')
+
+    return parser
+
+
+if __name__ == '__main__':
+    PARSER = fetch_args()
+    ARGS = PARSER.parse_args()
+    if ARGS.s == 'true' and not (ARGS.c and  ARGS.w):
+        PARSER.error('If slack argument is true, it requires slack_channel and webhookurl')
+
+    amibkp(ARGS.r, ARGS.d, ARGS.s, ARGS.c, ARGS.w)
+ 
+ ```
+
+
+Function uses two libraries(Pytz, Requests) other than AWS SDK provided, so for lambda we need to create deployment package along with the code and upload it to Lambda function. Please go through the official AWS [Documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html) to know more about how to create deployment package.
+
+## NOTE 
+* We are using CloudWatch Event Rules to schedule the run of Lambda Function, two function blocks are used as most of the times we ran into exception "errorType": "UnboundLocalError","errorMessage": "local variable 'snapshotid' referenced before assignment" as assignment of Snapshot ID took some time for some of the AMI's.
 
