@@ -1,6 +1,12 @@
 # Introduction
 
-## Here are the steps to do before you run the script:
+We realized that using S3 select we can run a lot of validations and also run ad-hoc filtering on the data available in S3.
+
+The major use case which got resolved from this script is data validation and thus has helped us do this in a cost-effective manner.
+
+
+
+# Requirements to run this script
 
 * Install Python on Windows (https://www.python.org/downloads/release/python-2715/) / Ubuntu users would have it already installed(version 2.7).
 * Install Pip on Windows (https://github.com/BurntSushi/nfldb/wiki/Python-&-pip-Windows-installation) / Ubuntu users would do using sudo apt-get install pip
@@ -8,8 +14,11 @@
 * Install Boto using: pip install boto3
 * Run the following to configure aws: aws configure
 
-Once the pre-requisits are installed, then starts the excution.
 
+
+# Execution
+
+Once the pre-requisites are installed, then starts the execution.
 
 
 ## Here are the different examples to run the file:
@@ -21,7 +30,7 @@ python s3_executor.py -b "bucket-name" -p "path/to/files/" -d TAB -s "select _1,
 ```
 
 
-* Select all rows by applying filter on Http Referral URL, where if we want to select the 2nd column and 3rd column with http_referral (5th column) has value with like '%it.eurosport.com%' -- query: "select _2, _3 from s3object s where _5 like '%it.eurosport.com%' "
+* Select all rows by applying the filter on Http Referral URL, where if we want to select the 2nd column and 3rd column with http_referral (5th column) has value with like '%it.eurosport.com%' -- query: "select _2, _3 from s3object s where _5 like '%it.eurosport.com%' "
 
 ```python
 python s3_executor.py -b "bucket-name" -p "path/to/files/" -d TAB -s "select _2, _3 from s3object s where _5 like '%it.eurosport.com%' " -o feed_for_eurosport.csv
@@ -29,4 +38,5 @@ python s3_executor.py -b "bucket-name" -p "path/to/files/" -d TAB -s "select _2,
 
 
 ## More
-Typing python s3_executor.py --help will give you the options.
+Typing ```python s3_executor.py --help``` will give you the options.
+
