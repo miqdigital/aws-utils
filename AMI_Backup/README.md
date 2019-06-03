@@ -40,6 +40,7 @@ Please the link for more information on how to generate webhook url for slack ht
 ```python
  python checsyntax.py -r us-west-2 -d 5 
 ``` 
+* Typing ```python python checsyntax.py -h will give you options```
 
 ### Modification For Lambda
 
