@@ -19,9 +19,7 @@ This will delete AMI's older than number days you provide as input and creates t
 Tag DELETEON=yes is used to identify the AMI's which are supposed to be deleted after given number of days.
 Tag Snapshottag=yes is used to identify the AMI's of which Snapshots needs to be tagged.
 
-Once the snapshots are tagged the tag Snapshottag=yes will be deleted from AMI
-
-Number of days to keep the AMI is an argument along with the region, modify those two arguments as per your requirement, please refer lambda handler block(line 145).
+Once the snapshots are tagged the tag Snapshottag=yes will be deleted from AMI.
 
 ## Exception handler:
 
