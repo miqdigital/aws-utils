@@ -1,4 +1,3 @@
-
 #! /usr/bin/python
 
 import argparse
@@ -23,49 +22,14 @@ def slack(event, channel, webhookurl):
               }
     req = requests.post(webhookurl, data=json.dumps(payload))
 
-def amibkp(region, days_del, slack_req, slack_channel, slack_webhook):
-    """
-    This function is the crucial function,
-    fetches all the instances which has tag Key:AMIBACKUPON, Value:yes and creates AMI in a loop,
-    along with propogating all the tags from instance to AMI to EBS Snapshots.
-    Also, it deletes all the AMI's which was created through this script
-    and older than number of days you provide as an argument.
-    Parameters
-    ----------
-    region: string
-          AWS region code.
-    days: integer
-          Number of days to keep AMI's before deleting.
-    slack: string
-          Optional argument.
-          Passing this parameter as "true" will post the execption to slack if any.
-    slack_channel: String
-          Slack channel to where exceptions has to be posted
-          Depends on the previous parameter "slack", this is required if slack is true.
-    webhookurl: string
-          Slack webhookurl to identify to which slack team exeception has to be posted?
-          Depends on the previous parameter "slack", this is required if slack is true.
-    Returns
-    -------
-    list
-        Returns list of AMI's/Snapshots deleted and newly created AMI's/Snapshots.
-    """
-    client = boto3.client('ec2', region_name=region)
-    ec2 = boto3.resource('ec2', region_name=region)
-    response2 = client.describe_images(
-        Filters=[
-            {
-                'Name': 'tag:DELETEON',
-                'Values': [
-                    'yes',
-                ]
-            },
-        ]
-    )
-    right_now_days_ago = datetime.datetime.today() - datetime.timedelta(days=days_del)
+
+def delete_ami(jsonresponse, days_older, slack_opt, channel_name, webhook_url, ec2, region):
+    #This function deletes AMI older than number of days to keep AMI.
+
+    right_now_days_ago = datetime.datetime.today() - datetime.timedelta(days=days_older)
     old_date = right_now_days_ago.replace(tzinfo=Utc)
 
-    for i in response2['Images']:
+    for i in jsonresponse['Images']:
         if i['CreationDate'] < str(old_date):
             image_id = i['ImageId']
             print image_id
@@ -85,23 +49,15 @@ def amibkp(region, days_del, slack_req, slack_channel, slack_webhook):
                 print e
                 message = 'Error while deleting image\nImageId:'+image_id+' \
                                   \nRegion:'+region+'\nException:'+str(e)
-                if slack_req == 'true':
-                    slack(message, slack_channel, slack_webhook)
+                if slack_opt == 'true':
+                    slack(message, channel_name, webhook_url)
                 else:
                     print message
 
-    response = client.describe_instances(
-        Filters=[
-            {
-                'Name': 'tag:AMIBACKUPON', #Tag used to identify list of Instances to be backed up.
-                'Values': [
-                    'yes',
-                ]
-            }
-        ]
-    )
+def create_ami(jsonresponse, slack_opt, channel_name, webhook_url, ec2, region):
+    # This function creates new AMI with tags for the instance which got backup tag
 
-    for i in response['Reservations']:
+    for i in jsonresponse['Reservations']:
         for j in i['Instances']:
             print j['InstanceId']
             iid = j['InstanceId']
@@ -144,25 +100,17 @@ def amibkp(region, days_del, slack_req, slack_channel, slack_webhook):
                 print e
                 message = 'Error while creating image of instance\n\nInstanceId:'+ iid +' \
                             \n\n Region:'+ region +'\n\n Exception:'+ str(e)
-                if slack_req == 'true':
-                    slack(message, slack_channel, slack_webhook)
+                if slack_opt == 'true':
+                    slack(message, channel_name, webhook_url)
                 else:
                     print message
-    response3 = client.describe_images(
-        Filters=[
-            {
-                'Name': 'tag:Snapshottag',
-                'Values': [
-                    'yes',
-                    ]
-            },
-        ]
-    )
 
-    for i in response3['Images']:
+def tag_snapshots(jsonresponse, slack_opt, channel_name, webhook_url, client, region):
+    # This function tags all the snapshots which are associated to new AMI's created.
+
+    for i in jsonresponse['Images']:
         image_id = i['ImageId']
         print image_id
-        descrip = i['Name']
         snap_tag_key_list = []
         snap_tag_value_list = []
         for k in i['Tags']:
@@ -191,12 +139,12 @@ def amibkp(region, days_del, slack_req, slack_channel, slack_webhook):
 
                 message = 'Error while creating tags on snapshots of AMI\nAMIId:'+image_id+' \
                             \nRegion:'+region+'\nException:'+ str(e)
-                if slack_req == 'true':
-                    slack(message, slack_channel, slack_webhook)
+                if slack_opt == 'true':
+                    slack(message, channel_name, webhook_url)
                 else:
                     print message
 
-        responsedel = client.delete_tags(
+        delete_tag = client.delete_tags(
             Resources=[
                 image_id,
                 ],
@@ -208,6 +156,72 @@ def amibkp(region, days_del, slack_req, slack_channel, slack_webhook):
             ]
         )
 
+
+def amibkp(region, days_del, slack_req, slack_channel, slack_webhook):
+    """
+    This function is the crucial function,
+    fetches all the instances which has tag Key:AMIBACKUPON, Value:yes and creates AMI in a loop,
+    along with propogating all the tags from instance to AMI to EBS Snapshots.
+    Also, it deletes all the AMI's which was created through this script
+    and older than number of days you provide as an argument.
+    Parameters
+    ----------
+    region: string
+          AWS region code.
+    days: integer
+          Number of days to keep AMI's before deleting.
+    slack: string
+          Optional argument.
+          Passing this parameter as "true" will post the execption to slack if any.
+    slack_channel: String
+          Slack channel to where exceptions has to be posted
+          Depends on the previous parameter "slack", this is required if slack is true.
+    webhookurl: string
+          Slack webhookurl to identify to which slack team exeception has to be posted?
+          Depends on the previous parameter "slack", this is required if slack is true.
+    Returns
+    -------
+    list
+        Returns list of AMI's/Snapshots deleted and newly created AMI's/Snapshots.
+    """
+    client = boto3.client('ec2', region_name=region)
+    ec2 = boto3.resource('ec2', region_name=region)
+
+    image_response = client.describe_images(
+        Filters=[
+            {
+                'Name': 'tag:DELETEON',
+                'Values': [
+                    'yes',
+                ]
+            },
+        ]
+    )
+    delete_ami(image_response, days_del, slack_req, slack_channel, slack_webhook, ec2, region)
+    
+    instance_response = client.describe_instances(
+        Filters=[
+            {
+                'Name': 'tag:alltagtest', #Tag used to identify list of Instances to be backed up.
+                'Values': [
+                    'yes',
+                ]
+            }
+        ]
+    )
+    create_ami(instance_response, slack_req, slack_channel, slack_webhook, ec2, region)
+    
+    new_image_response = client.describe_images(
+        Filters=[
+            {
+                'Name': 'tag:Snapshottag',
+                'Values': [
+                    'yes',
+                    ]
+            },
+        ]
+    )
+    tag_snapshots(new_image_response, slack_req, slack_channel, slack_webhook, client, region)
 
 def fetch_args():
     """
@@ -241,5 +255,3 @@ if __name__ == '__main__':
         PARSER.error('If slack argument is true, it requires slack_channel and webhookurl')
 
     amibkp(ARGS.r, ARGS.d, ARGS.s, ARGS.c, ARGS.w)
-
-
