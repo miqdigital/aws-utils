@@ -31,21 +31,21 @@ Once the snapshots are tagged the tag Snapshottag=yes will be deleted from AMI.
 * To create AMI's for the instances having tag Key:AMIBACKUPON Value:yes in us-east-1 region and to delete AMI's/Snapshots created through this script, also which are older than 10 days and to post exception in slack
 
 ```python
- python AMI_Backup.py -r us-east-1 -d 10 -s true -c "#ami_bkp_lambda" -w "https://hooks.slack.com/*********/*****"
+ python ami_backup.py -r us-east-1 -d 10 -s true -c "#ami_bkp_lambda" -w "https://hooks.slack.com/*********/*****"
 ``` 
 Please see the link for more information on how to generate webhook url for slack https://api.slack.com/incoming-webhooks
 
 * To create AMI's for the instances having tag Key:AMIBACKUPON Value:yes in us-west-2 region and to delete AMI's/Snapshots created through this script, also which are older than 5 days and not to post slack message.
 
 ```python
- python AMI_Backup.py -r us-west-2 -d 5 
+ python ami_backup.py -r us-west-2 -d 5 
 ``` 
-* Typing ```python AMI_Backup.py -h will give you the options```
+* Typing ```python ami_backup.py -h will give you the options```
 
 ### Modification For Lambda
 Code changes are required for this script to make it comaptible with Lambda.
 
-* Block that needs to be replaced, from line 214 to 245
+* Block that needs to be replaced, from line 226 to 257
 
 ```python
 def fetch_args():
