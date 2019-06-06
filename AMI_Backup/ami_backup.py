@@ -202,7 +202,7 @@ def amibkp(region, days_del, slack_req, slack_channel, slack_webhook):
     instance_response = client.describe_instances(
         Filters=[
             {
-                'Name': 'tag:alltagtest', #Tag used to identify list of Instances to be backed up.
+                'Name': 'tag:AMIBACKUPON', #Tag used to identify list of Instances to be backed up.
                 'Values': [
                     'yes',
                 ]
