@@ -230,7 +230,7 @@ def fetch_args():
     parser = \
         argparse.ArgumentParser(description=''' Provide AWS region and number of days
                                 to keep AMI and optional slack details:example
-                                python AMI_Backup.py -r "us-east-1" -d 10 -s true -c "#AWS_BKP",
+                                python ami_backup.py -r "us-east-1" -d 10 -s true -c "#AWS_BKP",
                                 -w "https://hooks.slack.com/************" ''')
     parser.add_argument('-r', metavar='--region', required=True,
                         help='''Provide the AWS region code, for example:  us-east-1 ''')
