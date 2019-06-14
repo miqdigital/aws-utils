@@ -45,7 +45,7 @@ Please see the link for more information on how to generate webhook url for slac
 ### Modification For Lambda
 Code changes are required for this script to make it comaptible with Lambda.
 
-* Block that needs to be replaced, from line 226 to 257
+* Block that needs to be replaced, from line 233 to 265
 
 ```python
 def fetch_args():
