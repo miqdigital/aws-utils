@@ -43,7 +43,7 @@ Please see the link for more information on how to generate webhook url for slac
 * Typing ```python ami_backup.py -h will give you the options```
 
 ### Modification For Lambda
-Code changes are required for this script to make it comaptible with Lambda.
+Code changes are required for this script to make it compatible with Lambda.
 
 * Block that needs to be replaced, from line 233 to 265
 
