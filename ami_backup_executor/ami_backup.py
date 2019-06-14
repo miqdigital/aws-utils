@@ -10,7 +10,9 @@ import boto3
 Utc = pytz.UTC
 
 def slack(event, channel, webhookurl):
-    #This function is used to post message to slack
+    """
+    This function is used to post message to slack.
+    """  
     message = 'AMI_BKP_ALERT'
     payload = {'channel': channel,
                'username': "AMI_BKP_SCRIPT",
@@ -24,8 +26,9 @@ def slack(event, channel, webhookurl):
 
 
 def delete_ami(jsonresponse, days_older, slack_opt, channel_name, webhook_url, ec2, region):
-    #This function deletes AMI older than number of days to keep AMI.
-
+    """
+    This function deletes AMI older than number of days to keep AMI.
+    """
     right_now_days_ago = datetime.datetime.today() - datetime.timedelta(days=days_older)
     old_date = right_now_days_ago.replace(tzinfo=Utc)
 
@@ -35,6 +38,7 @@ def delete_ami(jsonresponse, days_older, slack_opt, channel_name, webhook_url, e
             print image_id
             delimage = ec2.Image(image_id)
             snap_list = []
+            
             for j in i['BlockDeviceMappings']:
                 if 'Ebs'in j:
                     snap_list.append(j['Ebs']['SnapshotId'])
@@ -55,8 +59,9 @@ def delete_ami(jsonresponse, days_older, slack_opt, channel_name, webhook_url, e
                     print message
 
 def create_ami(jsonresponse, slack_opt, channel_name, webhook_url, ec2, region):
-    # This function creates new AMI with tags for the instance which got backup tag
-
+    """
+    This function creates new AMI with tags for the instance which got backup tag.
+    """
     for i in jsonresponse['Reservations']:
         for j in i['Instances']:
             print j['InstanceId']
@@ -64,6 +69,7 @@ def create_ami(jsonresponse, slack_opt, channel_name, webhook_url, ec2, region):
             tag_key_list = []
             tag_value_list = []
             instance = ec2.Instance(iid)
+            
             for k in instance.tags:
                 tag_key_list.append(k['Key'])
                 tag_value_list.append(k['Value'])
@@ -106,16 +112,19 @@ def create_ami(jsonresponse, slack_opt, channel_name, webhook_url, ec2, region):
                     print message
 
 def tag_snapshots(jsonresponse, slack_opt, channel_name, webhook_url, client, region):
-    # This function tags all the snapshots which are associated to new AMI's created.
-
+    """
+    This function tags all the snapshots which are associated to new AMI's created.
+    """
     for i in jsonresponse['Images']:
         image_id = i['ImageId']
         print image_id
         snap_tag_key_list = []
         snap_tag_value_list = []
+        
         for k in i['Tags']:
             snap_tag_key_list.append(k['Key'])
             snap_tag_value_list.append(k['Value'])
+            
         for j in i['BlockDeviceMappings']:
             if 'Ebs'in j:
                 snapid = j["Ebs"]["SnapshotId"]
@@ -134,9 +143,7 @@ def tag_snapshots(jsonresponse, slack_opt, channel_name, webhook_url, client, re
                         ],
                     )
             except Exception as e:
-
                 print e
-
                 message = 'Error while creating tags on snapshots of AMI\nAMIId:'+image_id+' \
                             \nRegion:'+region+'\nException:'+ str(e)
                 if slack_opt == 'true':
@@ -225,7 +232,7 @@ def amibkp(region, days_del, slack_req, slack_channel, slack_webhook):
 
 def fetch_args():
     """
-       Is an arguments parser which showcases all possible arguments this python function takes in.
+    Is an arguments parser which showcases all possible arguments this python function takes in.
     """
     parser = \
         argparse.ArgumentParser(description=''' Provide AWS region and number of days
