@@ -14,7 +14,7 @@ This function is for creating AMI as a backup for all required instances based o
 
 ### AMI Backup
 
-This will delete AMI's older than number days you provide as input and creates the new AMI for an instance and same AMI will be tagged by fetching all tags from instance and tags the AMI, two extra tags DELETEON=yes and Snapshottag=yes will be added inorder to identify AMI's while tagging snapshots and deleting older AMI's.
+This will delete AMI's created through this script and older than number days you provide as input and creates the new AMI for an instance and same AMI will be tagged by fetching all tags from instance, two extra tags DELETEON=yes and Snapshottag=yes will be added inorder to identify AMI's while tagging snapshots and deleting older AMI's, so basically any AMI with DELETEON=yes will be deleted when you run the script based on number of days you provide to keep AMI's.
 
 Tag DELETEON=yes is used to identify the AMI's which are supposed to be deleted after given number of days.
 Tag Snapshottag=yes is used to identify the AMI's of which Snapshots needs to be tagged.
