@@ -12,38 +12,42 @@ Utc = pytz.UTC
 def slack(event, channel, webhookurl):
     """
     This function is used to post message to slack.
-    """  
+    """
     message = 'AMI_BKP_ALERT'
-    payload = {'channel': channel,
-               'username': "AMI_BKP_SCRIPT",
-               'text': message,
-               'attachments': [{
+    payload = {
+            'channel': channel,
+            'username': "AMI_BKP_SCRIPT",
+            'text': message,
+            'attachments': [
+                {
                    'color': 'danger',
                    'fields': [{'value': event}]
-                   }]
-              }
+                   }
+            ]
+        }
     req = requests.post(webhookurl, data=json.dumps(payload))
 
 
-def delete_ami(jsonresponse, days_older, slack_opt, channel_name, webhook_url, ec2, region):
+def delete_ami(image_jsonresponse, days_older, slack_opt, channel_name, webhook_url, ec2, region):
     """
     This function deletes AMI older than number of days to keep AMI.
+
     """
     right_now_days_ago = datetime.datetime.today() - datetime.timedelta(days=days_older)
     old_date = right_now_days_ago.replace(tzinfo=Utc)
 
-    for i in jsonresponse['Images']:
+    for i in image_jsonresponse['Images']:
         if i['CreationDate'] < str(old_date):
             image_id = i['ImageId']
-            print image_id
+            print 'Image ID' + str(image_id)
             delimage = ec2.Image(image_id)
             snap_list = []
-            
+
             for j in i['BlockDeviceMappings']:
                 if 'Ebs'in j:
                     snap_list.append(j['Ebs']['SnapshotId'])
-            try:
 
+            try:
                 response = delimage.deregister()
                 for k in range(len(snap_list)):
                     snapshot = ec2.Snapshot(snap_list[k])
@@ -58,28 +62,31 @@ def delete_ami(jsonresponse, days_older, slack_opt, channel_name, webhook_url, e
                 else:
                     print message
 
-def create_ami(jsonresponse, slack_opt, channel_name, webhook_url, ec2, region):
+
+def create_ami(instance_jsonresponse, slack_opt, channel_name, webhook_url, ec2, region):
     """
     This function creates new AMI with tags for the instance which got backup tag.
     """
-    for i in jsonresponse['Reservations']:
+    for i in instance_jsonresponse['Reservations']:
         for j in i['Instances']:
-            print j['InstanceId']
+            print 'Instance ID: ' + str(j['InstanceId'])
             iid = j['InstanceId']
             tag_key_list = []
             tag_value_list = []
             instance = ec2.Instance(iid)
-            
+
             for k in instance.tags:
                 tag_key_list.append(k['Key'])
                 tag_value_list.append(k['Value'])
                 if k['Key'] == 'Name':
                     dscrip = k['Value']
+
             try:
                 image = instance.create_image(
-                    Name=dscrip+ "-" +str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S.%f')),
-                    NoReboot=True
+                        Name=dscrip+ "-" +str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S.%f')),
+                        NoReboot=True
                     )
+
                 for l in range(len(tag_key_list)):
                     tag = image.create_tags(
                         Tags=[
@@ -111,24 +118,25 @@ def create_ami(jsonresponse, slack_opt, channel_name, webhook_url, ec2, region):
                 else:
                     print message
 
-def tag_snapshots(jsonresponse, slack_opt, channel_name, webhook_url, client, region):
+
+def tag_snapshots(new_image_jsonresponse, slack_opt, channel_name, webhook_url, client, region):
     """
     This function tags all the snapshots which are associated to new AMI's created.
     """
-    for i in jsonresponse['Images']:
+    for i in new_image_jsonresponse['Images']:
         image_id = i['ImageId']
-        print image_id
+        print 'ImageID: ' + str(image_id)
         snap_tag_key_list = []
         snap_tag_value_list = []
-        
+
         for k in i['Tags']:
             snap_tag_key_list.append(k['Key'])
             snap_tag_value_list.append(k['Value'])
-            
+
         for j in i['BlockDeviceMappings']:
             if 'Ebs'in j:
                 snapid = j["Ebs"]["SnapshotId"]
-                print snapid
+
             try:
                 for l in range(len(snap_tag_key_list)):
                     responsetag = client.create_tags(
@@ -205,7 +213,7 @@ def amibkp(region, days_del, slack_req, slack_channel, slack_webhook):
         ]
     )
     delete_ami(image_response, days_del, slack_req, slack_channel, slack_webhook, ec2, region)
-    
+
     instance_response = client.describe_instances(
         Filters=[
             {
@@ -217,7 +225,7 @@ def amibkp(region, days_del, slack_req, slack_channel, slack_webhook):
         ]
     )
     create_ami(instance_response, slack_req, slack_channel, slack_webhook, ec2, region)
-    
+
     new_image_response = client.describe_images(
         Filters=[
             {
@@ -229,6 +237,7 @@ def amibkp(region, days_del, slack_req, slack_channel, slack_webhook):
         ]
     )
     tag_snapshots(new_image_response, slack_req, slack_channel, slack_webhook, client, region)
+
 
 def fetch_args():
     """

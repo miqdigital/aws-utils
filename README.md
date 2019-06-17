@@ -3,17 +3,20 @@
 This repository provides utilities which are used at MiQ.
 MiQ has been using AWS tech stack as it's the backbone and has been using many utilities to help scale their product.
 
+---
+ Available Executors
+---
 
-# Available Tools
-
-## S3 Select Executor
+# S3 Select Executor
 
 This utility provides a set of python scripts to effectively run S3 Select commands on the AWS S3 files. 
 Used for validation and ad hoc filtering. [Documentation](s3_select_executor/README.md)
 
-## AMI Backup
+
+# AMI Backup Executor
 
 This function is for creating AMI as a backup for required instance and delete older AMI's based on the retention period we provide. Every AMI and EBS Snapshots created will inherit all tags from instance
+
 
 ---
 
