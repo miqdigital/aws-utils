@@ -9,6 +9,14 @@ For more info refer, https://boto3.amazonaws.com/v1/documentation/api/latest/ref
 * Python should be installed in the system (v2.7).
 * To perform operations on RDS, if you are using an EC2 machine to host the script make sure the required AWS role is attached to that EC2 or if you are using this script in local then make sure the IAM user has necessary permissions.
 
+## Example to run the script:
+
+* Execute command as,
+
+```python
+python create_route53_entry.py
+```
+
 ## How it Works?
 * Script prompts for following user inputs:
     - Action : Here you need to enter which action you want to perform in R53. There are 3 choices available for the same:

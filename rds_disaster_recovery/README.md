@@ -22,7 +22,7 @@ You can use cron to schedule the backup script to take snapshots/backup periodic
 
 * To create manual snapshot of the db instance and copying it to the DR(destination) region, execute the following command(after altering the values according to db's specs in the script)
 ```python
-python rds_db_instances_backup.py.py  #in case of Db instance
+python rds_db_instances_backup.py  #in case of Db instance
 ```
 or
 ```python
