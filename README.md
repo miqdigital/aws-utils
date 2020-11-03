@@ -21,6 +21,8 @@ This function is for creating AMI as a backup for required instance and delete o
 # RDS Disaster Recovery
 The scripts present can be used to setup disaster recovery for RDS in AWS. It creates a manual snapshot of the current db present in production(source) region, then copies that snapshot to the DR(destination) region and if the disaster occurs db can be restored from the snapshots present in the DR region.
 
+# Route53 Entry Creation
+The script present automates the process of creating/modifying the AWS Route 53 entries via a python script using Boto3(Amazon Web Services SDK for Python)
 
 ---
 
