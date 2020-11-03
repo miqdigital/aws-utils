@@ -2,6 +2,10 @@
 
 The script automates the process of creating/modifying the AWS Route 53 entries via a python script in which Boto3(Amazon Web Services SDK for Python) has been used.The motive to reduce the time and effort compared to when Route 53 entries are created through AWS console(Connect with VPN(if applicable) -> Login into AWS Console ->Select R53 service -> Switch to desired hosted zone -> Create entry)
 
+![Boto3](https://user-images.githubusercontent.com/50901044/98013545-812e1600-1e20-11eb-9603-caed48a5e6ae.jpg)
+
+
+
 For more info refer, https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/route53.html
 
 ## Prerequisites
@@ -27,5 +31,9 @@ python create_route53_entry.py
     - Name : Here you need specify the name of the record that you want to create, update, or delete. Make sure to mention full URL with domain name (eg. test1.mycompany.com)
     - Value : Here you need to specify the current or new DNS record value.
     - Type : Enter the DNS record type (CNAME/A).
+  
+<img width="685" alt="Screenshot " src="https://user-images.githubusercontent.com/50901044/98010591-e253ea80-1e1c-11eb-82d9-0b8adbe439f2.png">
+
+    
 
 
