@@ -1,5 +1,8 @@
 Introduction
 For a production environment, it is important to take precautions so that you can recover if there’s an unexpected event. While Amazon RDS provides a highly available Multi-AZ configuration, it can’t protect from every possibility, such as a natural disaster, a malicious activity etc. So, its important to design and test a DR plan.
+For more info refer,
+https://aws.amazon.com/blogs/aws/new-whitepaper-use-aws-for-disaster-recovery/
+
 The scripts present can be used to setup disaster recovery for RDS in AWS. 
 
 Prerequisites
