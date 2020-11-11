@@ -21,10 +21,10 @@ You can use cron to schedule the backup script to take snapshots/backup periodic
 ## Some of the examples to run the script:
 
 * To create manual snapshot of the db instance and copying it to the DR(destination) region, execute the following command, the command should include 4 parameters in the following order:
-1. Source region
-2. Destination region
-3. Db cluster identifier name
-4. KMS key id( only if the db is encrypted, otw this can be commented out)
+  1. Source region
+  2. Destination region
+  3. Db cluster/instance identifier name
+  4. KMS key id( only if the db is encrypted, otherwise this can be commented out)
 ```python
 #in case of Db Instance
 python rds_db_instances_backup.py us-east-1 us-west-2 prod-db arn:aws:kms:xxxx:xxxx:key/xxxxxxxxxxx  
@@ -35,12 +35,17 @@ or
 python rds_aurora_cluster_backup.py us-east-1 us-west-2 prod-db arn:aws:kms:xxxx:xxxx:key/xxxxxxxxxxx 
 ```
 
-* To restore the Db in the event of disaster in the DR(destination) region, execute the following command, after execution of the command the script prompts the user for various inputs
+* To restore the Db in the event of disaster in the DR(destination) region, execute the following command, after execution of the command the script prompts the user for various inputs.
+
 ```python
-python rds_db_instances_restore.py #in case of Db instance
+#in case of Db instance
+python rds_db_instances_restore.py 
 ```
+<img width="631" alt="Screenshot 2020-11-11 at 11 57 48 AM" src="https://user-images.githubusercontent.com/50901044/98789252-0ff5f080-2428-11eb-8d37-1c1e48006fd4.png">
+
 or
 ```python
-rds_aurora_cluster_restore.py #in case of Db cluster
+#in case of Db cluster
+rds_aurora_cluster_restore.py
 ```
-
+<img width="569" alt="Screenshot 2020-11-11 at 2 26 16 PM" src="https://user-images.githubusercontent.com/50901044/98790570-ee960400-2429-11eb-8a2a-ce91934c9516.png">
