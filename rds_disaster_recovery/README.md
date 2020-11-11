@@ -20,16 +20,22 @@ You can use cron to schedule the backup script to take snapshots/backup periodic
 
 ## Some of the examples to run the script:
 
-* To create manual snapshot of the db instance and copying it to the DR(destination) region, execute the following command(after altering the values according to db's specs in the script)
+* To create manual snapshot of the db instance and copying it to the DR(destination) region, execute the following command, the command should include 4 parameters in the following order:
+1. Source region
+2. Destination region
+3. Db cluster identifier name
+4. KMS key id( only if the db is encrypted, otw this can be commented out)
 ```python
-python rds_db_instances_backup.py  #in case of Db instance
+#in case of Db Instance
+python rds_db_instances_backup.py us-east-1 us-west-2 prod-db arn:aws:kms:xxxx:xxxx:key/xxxxxxxxxxx  
 ```
 or
 ```python
-python rds_aurora_cluster_backup.py #in case of Db cluster
+#in case of Db cluster
+python rds_aurora_cluster_backup.py us-east-1 us-west-2 prod-db arn:aws:kms:xxxx:xxxx:key/xxxxxxxxxxx 
 ```
 
-* To restore the Db in the event of disaster in the DR(destination) region, execute the following command(after altering the values according to db's specs in the script)
+* To restore the Db in the event of disaster in the DR(destination) region, execute the following command, after execution of the command the script prompts the user for various inputs
 ```python
 python rds_db_instances_restore.py #in case of Db instance
 ```
