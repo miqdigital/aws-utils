@@ -5,16 +5,25 @@ import boto3
 import operator
 import sys
 
-client_us_west_2 = boto3.client("rds", region_name="us-west-2")
+Region2 = raw_input("Enter the Destination region in which you want to restore db: ") 
+instancename = raw_input("Enter the DBInstanceIdentifier: ")
+subnetgroupname = raw_input("Enter the Db Subnet group name: ")
+dbstoragetype =raw_input("Enter storage type for Db: ")
+portnumber = raw_input("Enter the port number: ")
+securitygroupid = raw_input("Enter the id of the security group: ")
+dbinstanceclass =raw_input("Enter the db instance class: ")
+
+
+client_Region2 = boto3.client("rds", region_name=Region2)
 
 
 def execute():
     today = datetime.now().strftime("%d-%m-%Y")
 
-    # Fetching latest snapshot of RDS that is to be restored in region 1 i.e. us-west-2(DR region)
-    print("Fetching ARN of latest Snapshot from us-west-2")
-    response = client_us_west_2.describe_db_snapshots(
-        DBInstanceIdentifier="instance-name",
+    # Fetching latest snapshot of RDS that is to be restored in DR region
+    print("Fetching ARN of latest Snapshot from " + Region2 )
+    response = client_Region2.describe_db_snapshots(
+        DBInstanceIdentifier=instancename,
         SnapshotType="manual"
     )
     # Sorting the response according to snapshot_creation_time to get the most recent snapshot
@@ -27,7 +36,7 @@ def execute():
     latest_snapshot_name = snapshots_list_sorted[0][0]
     
     # Fetching the arn of the latest snapshot
-    result = client_us_west_2.describe_db_snapshots(
+    result = client_Region2.describe_db_snapshots(
         DBSnapshotIdentifier=latest_snapshot_name,
         SnapshotType="manual"
     )
@@ -38,23 +47,23 @@ def execute():
     # Restoring the RDS from the latest snapshot also, specify KmsKeyId if db snapshot is encrypted
     # You may modify the following values acc. to your snapshot specs
     print("Restoring the RDS from the latest snapshot",latest_snapshot_name)
-    restore_response = client_us_west_2.restore_db_instance_from_db_snapshot(
-        DBInstanceIdentifier='instance-name',
+    restore_response = client_Region2.restore_db_instance_from_db_snapshot(
+        DBInstanceIdentifier=instancename,
         DBSnapshotIdentifier=latest_snapshot_name,
-        DBInstanceClass='db.t3.medium',
-        Port=3306,
-        DBSubnetGroupName='subnet-group-name',
+        DBInstanceClass=dbinstanceclass,
+        Port=portnumber,
+        DBSubnetGroupName=subnetgroupname,
         MultiAZ=False,
         PubliclyAccessible=False,
         CopyTagsToSnapshot=True,
-        StorageType='storage-type-of-db',
+        StorageType=dbstoragetype,
         VpcSecurityGroupIds=[
-        'sg-xxxxxxxxx'
+        securitygroupid
         ],
         EnableIAMDatabaseAuthentication=False
     )
-    status_response = client_us_west_2.describe_db_instances(
-        DBInstanceIdentifier='instance-name'
+    status_response = client_Region2.describe_db_instances(
+        DBInstanceIdentifier=instancename
     )
     status = status_response["DBInstances"][0]["DBInstanceStatus"]
     print("The current status of Database instance is now: ",status)
