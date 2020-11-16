@@ -14,7 +14,7 @@ The scripts present can be used to setup disaster recovery for RDS in AWS.
 
 ## How it Works?
 
-It works in two parts i.e. it creates a manual snapshot of the current db present in production(source) region, then copies that snapshot to the DR(destination) region and if the disaster occurs db can be restored from the snapshots present in the DR region. For Db instances, rds_db_instances_backup.py can be used for creating and copying the snapshot and rds_db_instances_restore.py can be used to restore the db in the DR region in the event of disaster, similarly for AWS Aurora cluster rds_aurora_cluster_backup.py and rds_aurora_cluster_restore.py can be used to solve the purpose.
+It works in two parts i.e. it creates a manual snapshot of the current db present in production(source) region, then copies that snapshot to the DR(destination) region and if the disaster occurs db can be restored from the snapshots present in the DR region. For Db instances, rds_db_instances_backup.py can be used for creating and copying the snapshot and rds_db_instances_restore.py can be used to restore the db in the DR region in the event of disaster, similarly for AWS RDS cluster rds_db_cluster_backup.py and rds_db_cluster_restore.py can be used to solve the purpose.
 ### Note:
 You can use cron to schedule the backup script to take snapshots/backup periodically.
 
@@ -32,7 +32,7 @@ python rds_db_instances_backup.py us-east-1 us-west-2 prod-db arn:aws:kms:xxxx:x
 or
 ```python
 #in case of Db cluster
-python rds_aurora_cluster_backup.py us-east-1 us-west-2 prod-db arn:aws:kms:xxxx:xxxx:key/xxxxxxxxxxx 
+python rds_db_cluster_backup.py us-east-1 us-west-2 prod-db arn:aws:kms:xxxx:xxxx:key/xxxxxxxxxxx 
 ```
 
 * To restore the Db in the event of disaster in the DR(destination) region, execute the following command, after execution of the command the script prompts the user for various inputs.
@@ -46,6 +46,6 @@ python rds_db_instances_restore.py
 or
 ```python
 #in case of Db cluster
-rds_aurora_cluster_restore.py
+python rds_db_cluster_restore.py
 ```
 <img width="569" alt="Screenshot 2020-11-11 at 2 26 16 PM" src="https://user-images.githubusercontent.com/50901044/98790570-ee960400-2429-11eb-8a2a-ce91934c9516.png">
