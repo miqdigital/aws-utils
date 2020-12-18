@@ -10,7 +10,7 @@ For more info refer, https://boto3.amazonaws.com/v1/documentation/api/latest/ref
 
 ## Prerequisites
 
-* Python should be installed in the system (v2.7).
+* Python should be installed in the system (v3).
 * To perform operations on AWS Route53, if you are using an EC2 machine to host the script make sure the required AWS role is attached to that EC2 or if you are using this script in local then make sure the IAM user has necessary permissions.
 
 ## Example to run the script:
@@ -18,7 +18,7 @@ For more info refer, https://boto3.amazonaws.com/v1/documentation/api/latest/ref
 * Execute command as,
 
 ```python
-python create_route53_entry.py
+python3 create_route53_entry.py
 ```
 
 ## How it Works?

@@ -1,11 +1,11 @@
 import boto3
 
 #To update an existing entry in R53 use 'UPSERT' in 'Action'
-Action = raw_input("Enter the Action you want to perform - CREATE/DELETE/UPSERT: ") 
-Name = raw_input("Enter the full URL here with domain name:")
-Value = raw_input("Mention IP or DNS name here: ")
-Type = raw_input("Enter the type of record you want to create in R53- CNAME/A:")
-HostedZoneId = raw_input("Enter the id of hosted zone in which entry need to be updated: ")	
+Action = input("Enter the Action you want to perform - CREATE/DELETE/UPSERT: ") 
+Name = input("Enter the full URL here with domain name:")
+Value = input("Mention IP or DNS name here: ")
+Type = input("Enter the type of record you want to create in R53- CNAME/A:")
+HostedZoneId = input("Enter the id of hosted zone in which entry need to be updated: ")	
 
 client = boto3.client('route53')
 
