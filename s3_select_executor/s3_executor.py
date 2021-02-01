@@ -28,7 +28,7 @@ def fetch_objects(bucket, prefix, throwerror):
     list
         Generates a list of keys which are found inside the prefix
     """
-    print 'Fetching s3 files from bucket ' + bucket + ' and prefix ' + prefix
+    print('Fetching s3 files from bucket ' + bucket + ' and prefix ' + prefix)
 
     s3 = boto3.client('s3')
     kwargs = {'Bucket': bucket}
@@ -145,7 +145,7 @@ if __name__ == '__main__':
     throwerror = args.e
 
     if bucket is None or prefix is None or sql is None:
-        print 'Please use: python s3_executor.py --help and pass valid arguments'
+        print('Please use: python s3_executor.py --help and pass valid arguments')
         exit(1)
 
     object_items = fetch_objects(bucket, prefix, throwerror)

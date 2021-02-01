@@ -39,7 +39,7 @@ def delete_ami(image_jsonresponse, days_older, slack_opt, channel_name, webhook_
     for i in image_jsonresponse['Images']:
         if i['CreationDate'] < str(old_date):
             image_id = i['ImageId']
-            print 'Image ID' + str(image_id)
+            print('Image ID' + str(image_id))
             delimage = ec2.Image(image_id)
             snap_list = []
 
@@ -52,15 +52,15 @@ def delete_ami(image_jsonresponse, days_older, slack_opt, channel_name, webhook_
                 for k in range(len(snap_list)):
                     snapshot = ec2.Snapshot(snap_list[k])
                     reponse = snapshot.delete()
-                    print "AMI snapshot ID deleted " + snap_list[k]
+                    print("AMI snapshot ID deleted " + snap_list[k])
             except Exception as e:
-                print e
+                print(e)
                 message = 'Error while deleting image\nImageId:'+image_id+' \
                                   \nRegion:'+region+'\nException:'+str(e)
                 if slack_opt == 'true':
                     slack(message, channel_name, webhook_url)
                 else:
-                    print message
+                    print(message)
 
 
 def create_ami(instance_jsonresponse, slack_opt, channel_name, webhook_url, ec2, region):
@@ -69,7 +69,7 @@ def create_ami(instance_jsonresponse, slack_opt, channel_name, webhook_url, ec2,
     """
     for i in instance_jsonresponse['Reservations']:
         for j in i['Instances']:
-            print 'Instance ID: ' + str(j['InstanceId'])
+            print('Instance ID: ' + str(j['InstanceId']))
             iid = j['InstanceId']
             tag_key_list = []
             tag_value_list = []
@@ -110,13 +110,13 @@ def create_ami(instance_jsonresponse, slack_opt, channel_name, webhook_url, ec2,
                     ]
                 )
             except Exception as e:
-                print e
+                print(e)
                 message = 'Error while creating image of instance\n\nInstanceId:'+ iid +' \
                             \n\n Region:'+ region +'\n\n Exception:'+ str(e)
                 if slack_opt == 'true':
                     slack(message, channel_name, webhook_url)
                 else:
-                    print message
+                    print(message)
 
 
 def tag_snapshots(new_image_jsonresponse, slack_opt, channel_name, webhook_url, client, region):
@@ -125,7 +125,7 @@ def tag_snapshots(new_image_jsonresponse, slack_opt, channel_name, webhook_url, 
     """
     for i in new_image_jsonresponse['Images']:
         image_id = i['ImageId']
-        print 'ImageID: ' + str(image_id)
+        print('ImageID: ' + str(image_id))
         snap_tag_key_list = []
         snap_tag_value_list = []
 
@@ -151,13 +151,13 @@ def tag_snapshots(new_image_jsonresponse, slack_opt, channel_name, webhook_url, 
                         ],
                     )
             except Exception as e:
-                print e
+                print(e)
                 message = 'Error while creating tags on snapshots of AMI\nAMIId:'+image_id+' \
                             \nRegion:'+region+'\nException:'+ str(e)
                 if slack_opt == 'true':
                     slack(message, channel_name, webhook_url)
                 else:
-                    print message
+                    print(message)
 
         delete_tag = client.delete_tags(
             Resources=[
