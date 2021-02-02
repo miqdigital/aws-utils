@@ -39,7 +39,7 @@ def write_to_console(r):
     for event in r['Payload']:
         if 'Records' in event:
             records = event['Records']['Payload'].decode('utf-8')
-            print records.encode('utf-8')
+            print(records.encode('utf-8'))
 
 
 def perform(bucket, prefix, expression, compression, content_type, content_options, output_file):
@@ -66,8 +66,8 @@ def perform(bucket, prefix, expression, compression, content_type, content_optio
 
 
     """
-    print "Performing, with: ", bucket, prefix, expression, compression, content_type, \
-    content_options
+    print("Performing, with: ", bucket, prefix, expression, compression, content_type,
+          content_options)
 
     r = s3.select_object_content(
             Bucket=bucket,
@@ -78,8 +78,7 @@ def perform(bucket, prefix, expression, compression, content_type, content_optio
             OutputSerialization={'CSV': {}},
     )
 
-    if (output_file != ''):
+    if output_file != '':
         write_to_file(r, output_file)
     else:
         write_to_console(r)
-
