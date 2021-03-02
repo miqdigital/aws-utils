@@ -42,7 +42,7 @@ def write_to_console(r):
             print(records.encode('utf-8'))
 
 
-def perform(bucket, prefix, expression, compression, content_type, content_options, output_file):
+def perform(bucket, prefix, expression, compression, content_type, content_options, output_file, output_content):
     """
     This function performs the actual fetch data operation by performing SQL queries.
 
@@ -63,11 +63,12 @@ def perform(bucket, prefix, expression, compression, content_type, content_optio
           For example - {"FieldDelimiter": delimiter_req, 'AllowQuotedRecordDelimiter': True, 'QuoteCharacter' : ""}
     output_file: string
           The file name to which the output can be appended.
-
+    output_content: string
+          The output needs to be either of CSV/JSON based on the content
 
     """
-    print("Performing, with: ", bucket, prefix, expression, compression, content_type,
-          content_options)
+    print("Performing, with: ", "bucket:", bucket, "prefix:", prefix, "expression:", expression, 
+        "compression:", compression, "content_type:", content_type, "content_options:", content_options)
 
     r = s3.select_object_content(
             Bucket=bucket,
@@ -75,7 +76,7 @@ def perform(bucket, prefix, expression, compression, content_type, content_optio
             ExpressionType='SQL',
             Expression=expression,
             InputSerialization={'CompressionType': compression, content_type: content_options},
-            OutputSerialization={'CSV': {}},
+            OutputSerialization={output_content: {}},
     )
 
     if output_file != '':
