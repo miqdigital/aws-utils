@@ -8,7 +8,7 @@ import boto3
 
 from select_runner import *
 
-def fetch_objects(bucket, prefix, throwerror):
+def fetch_objects(bucket, prefix, throwerror, **kwargs):
     """
     This solution was available via: https://alexwlchan.net/2018/01/listing-s3-keys-redux/
     This function is the crucial function, which loops through all the available files in a folder and fetches the key of that object.
@@ -17,12 +17,14 @@ def fetch_objects(bucket, prefix, throwerror):
     Parameters
     ----------
     bucket: string
-          takes the bucket name
+            takes the bucket name
     prefix: string
-          takes the prefix - either till the folder or till the entire file name.
+            takes the prefix - either till the folder or till the entire file name.
     throwerror: boolean
-              this boolean value depicts whether to throw exception in case there
-              is any missing data (useful for validation)
+            this boolean value depicts whether to throw exception in case there
+            is any missing data (useful for validation)
+    kwargs: dict
+            this has the kwargs which can more optional parameters
     Returns
     -------
     list
@@ -32,6 +34,7 @@ def fetch_objects(bucket, prefix, throwerror):
 
     s3 = boto3.client('s3')
     kwargs = {'Bucket': bucket}
+    exclude = kwargs.get('exclude', None)
 
     # If the prefix is a single string (not a tuple of strings), we can
     # do the filtering directly in the S3 API.
@@ -52,7 +55,8 @@ def fetch_objects(bucket, prefix, throwerror):
 
         for obj in contents:
             key = obj['Key']
-            if key.startswith(prefix):
+
+            if key.startswith(prefix) and (not exclude or key.find(exclude) == -1):
                 yield key
 
         # The S3 API is paginated, returning up to 1000 keys at a time.
@@ -70,18 +74,19 @@ def fetch_args():
     """
     parser = \
         argparse.ArgumentParser(description='''Provide S3 details: example python s3_executor.py  -b "bucket-name" -p "path/to/file/mysample-file.tsv.gz" -d TAB -s "select * from s3object s where _88 != 'VIEW_DETECTED' limit 10" ''')
-    parser.add_argument('-b', metavar='--bucket',
+    parser.add_argument('-b', metavar='--bucket', required=True,
                         help='''Provide the bucket name, for example:  bucket-name ''')
-    parser.add_argument('-p', metavar='--prefix',
+    parser.add_argument('-p', metavar='--prefix', required=True,
                         help='''Provide the prefix - till the folder, for example: path/to/file/mysample-file.tsv.gz''')
-    parser.add_argument('-comp', metavar='--compression', help='''Is the compression
+    parser.add_argument('-comp', metavar='--compression', required=True, help='''Is the compression
             available - GZIP/None/BZIP2''', default="GZIP")
     parser.add_argument('-c', metavar='--ctype', help='Content Type of the file - CSV/JSON/Parquet',
             default='CSV')
     parser.add_argument('-d', metavar='--delimiter', help='Provide the Delimiter - COMMA/TAB', default='COMMA')
-    parser.add_argument('-s', metavar='--sql', help='''Provide the SQL to be executed, for example:
+    parser.add_argument('-s', metavar='--sql',  required=True, help='''Provide the SQL to be executed, for example:
             select _1, _2, _20 from s3object s where _88 != 'VIEW_DETECTED' limit 10''', default='')
     parser.add_argument('-o', metavar='--outputfile', help='Provide the filename to dump the records fetched', default='')
+    parser.add_argument('-exc', metavar='--exclude', help='Provide the file regex to exclude', default=None)
     parser.add_argument('-e', metavar='--throwerror', help='Boolean value true/false - which determines whether to throw error while processing', default='false')
 
     return parser
@@ -103,8 +108,10 @@ def get_content_type(content_type):
     In case it's a TSV or CSV the return value is always csv
     """
     value = "CSV"
-    if content_type == "Parquet":
-        value = content_type
+    if content_type.lower() == "parquet":
+        value = 'Parquet'
+    elif content_type.lower() == "json":
+        value = 'JSON'
 
     return value
 
@@ -113,10 +120,20 @@ def get_delimiter(delimiter):
     Get's the delimiter, in case nothing is given, then it would None
     """
     value = None
-    if delimiter == "COMMA":
+    if delimiter.lower() == "comma":
         value = ","
-    elif delimiter == "TAB":
+    elif delimiter.lower() == "tab":
         value = "\t"
+
+    return value
+
+def get_output_content(content_type):
+    """
+    Get the outcontent type based on the expected content
+    """
+    value = 'CSV'
+    if content_type.lower() == 'json':
+        value = 'JSON'
 
     return value
 
@@ -127,8 +144,12 @@ def get_content_options(kwargs):
     """
     content_options = {}
 
-    if kwargs['content_type'] != 'Parquet':
+    if kwargs['content_type'].lower() != 'parquet' and kwargs['content_type'].lower() != 'json':
         content_options = {'AllowQuotedRecordDelimiter': True, 'QuoteCharacter' : ""}
+        if delimiter:
+            content_options['FieldDelimiter'] = kwargs['delimiter']
+    elif kwargs['content_type'].lower() == 'json':
+        content_options = {'Type': "DOCUMENT"}
         if delimiter:
             content_options['FieldDelimiter'] = kwargs['delimiter']
 
@@ -143,20 +164,22 @@ if __name__ == '__main__':
     bucket = args.b
     prefix = args.p
     throwerror = args.e
+    exclude = args.exc
 
     if bucket is None or prefix is None or sql is None:
         print('Please use: python s3_executor.py --help and pass valid arguments')
         exit(1)
 
-    object_items = fetch_objects(bucket, prefix, throwerror)
+    object_items = fetch_objects(bucket, prefix, throwerror, exclude=exclude)
 
     comp = get_compression(args.comp)
     content_type = get_content_type(args.c)
     delimiter = get_delimiter(args.d)
     output_file = args.o
     content_options = get_content_options({ 'content_type': content_type, 'delimiter': delimiter })
+    output_content = get_output_content(content_type)
 
     for item in object_items:
-        perform(bucket, item, sql, comp, content_type, content_options, output_file)
+        perform(bucket, item, sql, comp, content_type, content_options, output_file, output_content)
 
 
