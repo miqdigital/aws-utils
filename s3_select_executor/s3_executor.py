@@ -108,10 +108,10 @@ def get_content_type(content_type):
     In case it's a TSV or CSV the return value is always csv
     """
     value = "CSV"
-    if content_type == "Parquet":
-        value = content_type
-    elif content_type == "JSON":
-        value = content_type
+    if content_type.lower() == "parquet":
+        value = 'Parquet'
+    elif content_type.lower() == "json":
+        value = 'JSON'
 
     return value
 
@@ -120,9 +120,9 @@ def get_delimiter(delimiter):
     Get's the delimiter, in case nothing is given, then it would None
     """
     value = None
-    if delimiter == "COMMA":
+    if delimiter.lower() == "comma":
         value = ","
-    elif delimiter == "TAB":
+    elif delimiter.lower() == "tab":
         value = "\t"
 
     return value
@@ -132,7 +132,7 @@ def get_output_content(content_type):
     Get the outcontent type based on the expected content
     """
     value = 'CSV'
-    if content_type == 'JSON':
+    if content_type.lower() == 'json':
         value = 'JSON'
 
     return value
@@ -144,11 +144,11 @@ def get_content_options(kwargs):
     """
     content_options = {}
 
-    if kwargs['content_type'] != 'Parquet' and kwargs['content_type'] != 'JSON':
+    if kwargs['content_type'].lower() != 'parquet' and kwargs['content_type'].lower() != 'json':
         content_options = {'AllowQuotedRecordDelimiter': True, 'QuoteCharacter' : ""}
         if delimiter:
             content_options['FieldDelimiter'] = kwargs['delimiter']
-    if kwargs['content_type'] == 'JSON':
+    elif kwargs['content_type'].lower() == 'json':
         content_options = {'Type': "DOCUMENT"}
         if delimiter:
             content_options['FieldDelimiter'] = kwargs['delimiter']
